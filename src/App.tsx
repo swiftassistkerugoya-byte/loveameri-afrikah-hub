@@ -11,6 +11,8 @@ import Branches from "./pages/Branches";
 import Contact from "./pages/Contact";
 import Reven from "./pages/Reven";
 import Insights from "./pages/Insights";
+import Auth from "./pages/Auth";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +32,8 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/reven" element={<Reven />} />
           <Route path="/insights" element={<Insights />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
