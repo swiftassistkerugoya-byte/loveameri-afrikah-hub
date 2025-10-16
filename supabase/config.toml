@@ -1,1 +1,4 @@
 project_id = "vtzfhshjmoxblhuufwad"
+
+[functions.reven-chat]
+verify_jwt = false

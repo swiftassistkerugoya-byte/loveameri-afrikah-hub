@@ -4,6 +4,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { RevenChat } from "@/components/RevenChat";
 
 const Reven = () => {
   const capabilities = [
@@ -51,6 +52,7 @@ const Reven = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      <RevenChat />
       
       {/* Hero Section */}
       <section className="pt-32 pb-20 bg-gradient-hero text-white overflow-hidden relative">
@@ -75,14 +77,9 @@ const Reven = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-primary font-semibold px-8 shadow-glow">
-                Start Chat Now
-                <MessageCircle className="ml-2 h-5 w-5" />
-              </Button>
-              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-primary font-semibold px-8">
-                Learn More
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              <p className="text-white/90 text-lg">
+                👉 Click the chat button in the bottom-right corner to start chatting with Reven!
+              </p>
             </div>
           </div>
         </div>
@@ -261,15 +258,9 @@ const Reven = () => {
             Start chatting with Reven now and get instant help with your business needs
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-accent hover:bg-accent/90 text-primary font-semibold px-8 shadow-glow">
-              Start Chat with Reven
-              <MessageCircle className="ml-2 h-5 w-5" />
-            </Button>
-            <Link to="/contact">
-              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-primary font-semibold px-8">
-                Contact Human Team
-              </Button>
-            </Link>
+            <p className="text-white/90 text-xl">
+              Click the chat button to start chatting with Reven now! 💬
+            </p>
           </div>
         </div>
       </section>
