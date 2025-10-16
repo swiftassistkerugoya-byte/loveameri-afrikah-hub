@@ -58,13 +58,13 @@ const Footer = () => {
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 mt-1 text-accent shrink-0" />
                 <span className="opacity-80">
-                  28 North Cleveland Ave, Hagerstown, MD, USA
+                  28 North Cleveland Ave, Hagerstown, Maryland 21740, USA
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 mt-1 text-accent shrink-0" />
                 <span className="opacity-80">
-                  Precious Plaza, Suite #30, Nairobi, Kenya
+                  Precious Plaza Building, Suite #30, Naivasha Road, Kawangware, Nairobi City
                 </span>
               </li>
             </ul>

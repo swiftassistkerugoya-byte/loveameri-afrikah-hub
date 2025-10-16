@@ -9,21 +9,21 @@ const Branches = () => {
     {
       country: "🇺🇸 United States",
       city: "Hagerstown, Maryland",
-      address: "28 North Cleveland Ave, Hagerstown, Maryland",
+      address: "28 North Cleveland Ave, Hagerstown, Maryland 21740, USA",
       phone: "+1 (XXX) XXX-XXXX",
       email: "usa@loveameriafrikah.com",
       hours: "Mon-Fri: 9:00 AM - 6:00 PM EST",
-      mapUrl: "https://maps.google.com/?q=28+North+Cleveland+Ave+Hagerstown+Maryland",
+      mapUrl: "https://maps.google.com/?q=28+North+Cleveland+Ave+Hagerstown+Maryland+21740+USA",
       color: "from-blue-600/10 to-blue-600/5"
     },
     {
       country: "🇰🇪 Kenya",
       city: "Nairobi",
-      address: "Precious Plaza, Suite #30, Naivasha Road, Nairobi",
+      address: "Precious Plaza Building, Suite #30, Naivasha Road, Kawangware, Nairobi City",
       phone: "+254 XXX XXX XXX",
       email: "kenya@loveameriafrikah.com",
       hours: "Mon-Fri: 8:00 AM - 5:00 PM EAT",
-      mapUrl: "https://maps.google.com/?q=Precious+Plaza+Naivasha+Road+Nairobi+Kenya",
+      mapUrl: "https://maps.google.com/?q=Precious+Plaza+Building+Naivasha+Road+Kawangware+Nairobi+Kenya",
       color: "from-green-600/10 to-green-600/5"
     },
     {
@@ -43,7 +43,7 @@ const Branches = () => {
       phone: "+233 XXX XXX XXX",
       email: "ghana@loveameriafrikah.com",
       hours: "Mon-Fri: 8:00 AM - 5:00 PM GMT",
-      mapUrl: "https://maps.google.com/?q=Liberation+Road+Accra+Ghana",
+      mapUrl: "https://maps.google.com/?q=Lunch+City+Liberation+Road+Accra+Ghana",
       color: "from-red-600/10 to-red-600/5"
     }
   ];
