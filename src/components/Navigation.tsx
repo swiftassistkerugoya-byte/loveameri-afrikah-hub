@@ -12,6 +12,7 @@ const Navigation = () => {
     { name: "About Us", path: "/about" },
     { name: "Our Services", path: "/services" },
     { name: "Products", path: "/products" },
+    { name: "Marketplace", path: "/marketplace" },
     { name: "Branches", path: "/branches" },
     { name: "AI Assistant", path: "/reven" },
     { name: "Insights", path: "/insights" },
