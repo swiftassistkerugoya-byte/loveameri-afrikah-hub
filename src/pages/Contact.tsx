@@ -52,8 +52,8 @@ const Contact = () => {
     {
       icon: Phone,
       title: "Call Us",
-      details: ["USA: +1 (XXX) XXX-XXXX", "Kenya: +254 XXX XXX XXX"],
-      action: "tel:+1XXXXXXXXXX"
+      details: ["Ghana: +233 59 601 4324", "Tanzania: +255 698 068 063"],
+      action: "tel:+233596014324"
     },
     {
       icon: MapPin,
