@@ -56,6 +56,22 @@ const Footer = () => {
                 </div>
               </li>
               <li className="flex items-start gap-2">
+                <Phone className="h-4 w-4 mt-1 text-accent shrink-0" />
+                <div>
+                  <a href="tel:+233596014324" className="opacity-80 hover:opacity-100 hover:text-accent transition-colors">
+                    Ghana: +233 59 601 4324
+                  </a>
+                </div>
+              </li>
+              <li className="flex items-start gap-2">
+                <Phone className="h-4 w-4 mt-1 text-accent shrink-0" />
+                <div>
+                  <a href="tel:+255698068063" className="opacity-80 hover:opacity-100 hover:text-accent transition-colors">
+                    Tanzania: +255 698 068 063
+                  </a>
+                </div>
+              </li>
+              <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 mt-1 text-accent shrink-0" />
                 <span className="opacity-80">
                   28 North Cleveland Ave, Hagerstown, Maryland 21740, USA
@@ -71,8 +87,9 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-primary-foreground/20 text-center text-sm opacity-80">
+        <div className="mt-12 pt-8 border-t border-primary-foreground/20 text-center text-sm opacity-80 space-y-2">
           <p>&copy; {new Date().getFullYear()} LoveAmeriAfrikah Enterprises Ltd. All rights reserved.</p>
+          <p>Developed by <span className="font-semibold text-accent">Laban Panda Khisa</span></p>
         </div>
       </div>
     </footer>
