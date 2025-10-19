@@ -1,11 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { User } from "@supabase/supabase-js";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      setIsAdmin(!!data);
+    };
+
+    checkAdminStatus();
+  }, [user]);
 
   const links = [
     { name: "Home", path: "/" },
@@ -47,6 +85,30 @@ const Navigation = () => {
                 {link.name}
               </Link>
             ))}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  location.pathname === "/admin"
+                    ? "text-accent bg-accent/10"
+                    : "text-foreground hover:text-accent hover:bg-accent/5"
+                }`}
+              >
+                Admin
+              </Link>
+            )}
+            {!user && (
+              <Link
+                to="/auth"
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  location.pathname === "/auth"
+                    ? "text-accent bg-accent/10"
+                    : "text-foreground hover:text-accent hover:bg-accent/5"
+                }`}
+              >
+                Sign In
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -75,6 +137,32 @@ const Navigation = () => {
                 {link.name}
               </Link>
             ))}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                onClick={() => setIsOpen(false)}
+                className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                  location.pathname === "/admin"
+                    ? "text-accent bg-accent/10"
+                    : "text-foreground hover:text-accent hover:bg-accent/5"
+                }`}
+              >
+                Admin
+              </Link>
+            )}
+            {!user && (
+              <Link
+                to="/auth"
+                onClick={() => setIsOpen(false)}
+                className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                  location.pathname === "/auth"
+                    ? "text-accent bg-accent/10"
+                    : "text-foreground hover:text-accent hover:bg-accent/5"
+                }`}
+              >
+                Sign In
+              </Link>
+            )}
           </div>
         )}
       </div>
