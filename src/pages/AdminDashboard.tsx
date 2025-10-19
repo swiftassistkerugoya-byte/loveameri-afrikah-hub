@@ -5,9 +5,25 @@ import { User, Session } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Users, Shield, LayoutDashboard, LogOut } from "lucide-react";
+import { 
+  Users, Shield, LayoutDashboard, LogOut, Package, Briefcase, 
+  FileText, MapPin, Bot, ShoppingCart, MessageSquare, 
+  BarChart3, Settings, FileCode, Activity 
+} from "lucide-react";
 import AdminUsers from "@/components/admin/AdminUsers";
 import AdminRoles from "@/components/admin/AdminRoles";
+import AdminProducts from "@/components/admin/AdminProducts";
+import AdminServices from "@/components/admin/AdminServices";
+import AdminBlog from "@/components/admin/AdminBlog";
+import AdminBranches from "@/components/admin/AdminBranches";
+import AdminRevenConfig from "@/components/admin/AdminRevenConfig";
+import AdminOrders from "@/components/admin/AdminOrders";
+import AdminMessages from "@/components/admin/AdminMessages";
+import AdminClients from "@/components/admin/AdminClients";
+import AdminAnalytics from "@/components/admin/AdminAnalytics";
+import AdminCMS from "@/components/admin/AdminCMS";
+import AdminSettings from "@/components/admin/AdminSettings";
+import AdminActivityLogs from "@/components/admin/AdminActivityLogs";
 
 const AdminDashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -172,30 +188,65 @@ const AdminDashboard = () => {
           )}
 
           {/* Navigation */}
-          <div className="flex gap-2 border-b pb-4">
-            <Button
-              variant={activeTab === "overview" ? "default" : "outline"}
-              onClick={() => setActiveTab("overview")}
-            >
-              Overview
+          <div className="flex gap-2 border-b pb-4 overflow-x-auto">
+            <Button size="sm" variant={activeTab === "overview" ? "default" : "outline"} onClick={() => setActiveTab("overview")}>
+              <LayoutDashboard className="h-4 w-4 mr-2" />Overview
             </Button>
-            <Button
-              variant={activeTab === "users" ? "default" : "outline"}
-              onClick={() => setActiveTab("users")}
-            >
-              Users
+            <Button size="sm" variant={activeTab === "products" ? "default" : "outline"} onClick={() => setActiveTab("products")}>
+              <Package className="h-4 w-4 mr-2" />Products
             </Button>
-            <Button
-              variant={activeTab === "roles" ? "default" : "outline"}
-              onClick={() => setActiveTab("roles")}
-            >
-              Roles
+            <Button size="sm" variant={activeTab === "services" ? "default" : "outline"} onClick={() => setActiveTab("services")}>
+              <Briefcase className="h-4 w-4 mr-2" />Services
+            </Button>
+            <Button size="sm" variant={activeTab === "blog" ? "default" : "outline"} onClick={() => setActiveTab("blog")}>
+              <FileText className="h-4 w-4 mr-2" />Blog
+            </Button>
+            <Button size="sm" variant={activeTab === "branches" ? "default" : "outline"} onClick={() => setActiveTab("branches")}>
+              <MapPin className="h-4 w-4 mr-2" />Branches
+            </Button>
+            <Button size="sm" variant={activeTab === "reven" ? "default" : "outline"} onClick={() => setActiveTab("reven")}>
+              <Bot className="h-4 w-4 mr-2" />Reven AI
+            </Button>
+            <Button size="sm" variant={activeTab === "orders" ? "default" : "outline"} onClick={() => setActiveTab("orders")}>
+              <ShoppingCart className="h-4 w-4 mr-2" />Orders
+            </Button>
+            <Button size="sm" variant={activeTab === "messages" ? "default" : "outline"} onClick={() => setActiveTab("messages")}>
+              <MessageSquare className="h-4 w-4 mr-2" />Messages
+            </Button>
+            <Button size="sm" variant={activeTab === "users" ? "default" : "outline"} onClick={() => setActiveTab("users")}>
+              <Users className="h-4 w-4 mr-2" />Users
+            </Button>
+            <Button size="sm" variant={activeTab === "roles" ? "default" : "outline"} onClick={() => setActiveTab("roles")}>
+              <Shield className="h-4 w-4 mr-2" />Roles
+            </Button>
+            <Button size="sm" variant={activeTab === "analytics" ? "default" : "outline"} onClick={() => setActiveTab("analytics")}>
+              <BarChart3 className="h-4 w-4 mr-2" />Analytics
+            </Button>
+            <Button size="sm" variant={activeTab === "cms" ? "default" : "outline"} onClick={() => setActiveTab("cms")}>
+              <FileCode className="h-4 w-4 mr-2" />CMS
+            </Button>
+            <Button size="sm" variant={activeTab === "settings" ? "default" : "outline"} onClick={() => setActiveTab("settings")}>
+              <Settings className="h-4 w-4 mr-2" />Settings
+            </Button>
+            <Button size="sm" variant={activeTab === "logs" ? "default" : "outline"} onClick={() => setActiveTab("logs")}>
+              <Activity className="h-4 w-4 mr-2" />Logs
             </Button>
           </div>
 
           {/* Content */}
+          {activeTab === "products" && <AdminProducts />}
+          {activeTab === "services" && <AdminServices />}
+          {activeTab === "blog" && <AdminBlog />}
+          {activeTab === "branches" && <AdminBranches />}
+          {activeTab === "reven" && <AdminRevenConfig />}
+          {activeTab === "orders" && <AdminOrders />}
+          {activeTab === "messages" && <AdminMessages />}
           {activeTab === "users" && <AdminUsers />}
           {activeTab === "roles" && <AdminRoles />}
+          {activeTab === "analytics" && <AdminAnalytics />}
+          {activeTab === "cms" && <AdminCMS />}
+          {activeTab === "settings" && <AdminSettings />}
+          {activeTab === "logs" && <AdminActivityLogs />}
         </div>
       </div>
     </div>
