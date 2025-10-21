@@ -24,7 +24,7 @@ const Auth = () => {
         setSession(session);
         setUser(session?.user ?? null);
         if (session) {
-          navigate("/admin");
+          navigate("/");
         }
       }
     );
@@ -33,7 +33,7 @@ const Auth = () => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session) {
-        navigate("/admin");
+        navigate("/");
       }
     });
 
@@ -49,7 +49,7 @@ const Auth = () => {
     const password = formData.get("signup-password") as string;
     const fullName = formData.get("full-name") as string;
 
-    const redirectUrl = `${window.location.origin}/admin`;
+    const redirectUrl = `${window.location.origin}/`;
 
     const { error } = await supabase.auth.signUp({
       email,
@@ -113,9 +113,9 @@ const Auth = () => {
       <main className="flex-1 flex items-center justify-center py-12 px-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Admin Access</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">Welcome</CardTitle>
             <CardDescription className="text-center">
-              Sign in or create an account to access the admin portal
+              Sign in or create an account to get started
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -133,7 +133,7 @@ const Auth = () => {
                       id="signin-email"
                       name="signin-email"
                       type="email"
-                      placeholder="admin@example.com"
+                      placeholder="you@example.com"
                       required
                     />
                   </div>
@@ -170,7 +170,7 @@ const Auth = () => {
                       id="signup-email"
                       name="signup-email"
                       type="email"
-                      placeholder="admin@example.com"
+                      placeholder="you@example.com"
                       required
                     />
                   </div>
