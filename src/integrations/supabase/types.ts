@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          entity_id: string | null
+          entity_type: string
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string | null
@@ -77,6 +113,48 @@ export type Database = {
         }
         Relationships: []
       }
+      branches: {
+        Row: {
+          address: string
+          contact_info: string
+          country: string
+          created_at: string
+          google_maps_link: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          updated_at: string
+          whatsapp: string | null
+          working_hours: string | null
+        }
+        Insert: {
+          address: string
+          contact_info: string
+          country: string
+          created_at?: string
+          google_maps_link?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          updated_at?: string
+          whatsapp?: string | null
+          working_hours?: string | null
+        }
+        Update: {
+          address?: string
+          contact_info?: string
+          country?: string
+          created_at?: string
+          google_maps_link?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          updated_at?: string
+          whatsapp?: string | null
+          working_hours?: string | null
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           created_at: string
@@ -108,6 +186,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      cms_pages: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          page_key: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          page_key: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          page_key?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      company_settings: {
+        Row: {
+          created_at: string
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          setting_key: string
+          setting_value?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
+        }
+        Relationships: []
       }
       messages: {
         Row: {
@@ -288,6 +417,75 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reven_config: {
+        Row: {
+          auto_email_on_missed: boolean | null
+          created_at: string
+          greeting_message: string
+          id: string
+          personality: string | null
+          response_delay: number | null
+          tone: string
+          updated_at: string
+        }
+        Insert: {
+          auto_email_on_missed?: boolean | null
+          created_at?: string
+          greeting_message?: string
+          id?: string
+          personality?: string | null
+          response_delay?: number | null
+          tone?: string
+          updated_at?: string
+        }
+        Update: {
+          auto_email_on_missed?: boolean | null
+          created_at?: string
+          greeting_message?: string
+          id?: string
+          personality?: string | null
+          response_delay?: number | null
+          tone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          created_at: string
+          cta_link: string | null
+          description: string
+          display_on_homepage: boolean | null
+          hero_image: string | null
+          id: string
+          price_range: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cta_link?: string | null
+          description: string
+          display_on_homepage?: boolean | null
+          hero_image?: string | null
+          id?: string
+          price_range?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cta_link?: string | null
+          description?: string
+          display_on_homepage?: boolean | null
+          hero_image?: string | null
+          id?: string
+          price_range?: string | null
+          title?: string
           updated_at?: string
         }
         Relationships: []
