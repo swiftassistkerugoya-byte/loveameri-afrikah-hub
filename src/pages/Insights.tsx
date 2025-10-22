@@ -1,82 +1,105 @@
 import { Calendar, User, ArrowRight, TrendingUp, Globe, Briefcase } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
 
 const Insights = () => {
-  const featuredPost = {
-    title: "The Future of African-American Trade Relations",
-    excerpt: "Exploring emerging opportunities and partnerships between the United States and African markets in 2025 and beyond.",
-    category: "Global Trade",
-    date: "January 15, 2025",
-    author: "LoveAmeriAfrikah Team",
-    readTime: "5 min read",
-    image: "🌍"
+  const { toast } = useToast();
+  const [blogPosts, setBlogPosts] = useState<any[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<any[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("All Posts");
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchBlogPosts();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCategory === "All Posts") {
+      setFilteredPosts(blogPosts);
+    } else {
+      setFilteredPosts(blogPosts.filter(post => post.category === selectedCategory));
+    }
+  }, [selectedCategory, blogPosts]);
+
+  const fetchBlogPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('status', 'published')
+        .order('published_at', { ascending: false });
+
+      if (error) throw error;
+      setBlogPosts(data || []);
+      setFilteredPosts(data || []);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to load blog posts",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const articles = [
-    {
-      title: "Digital Transformation in International Trade",
-      excerpt: "How technology is reshaping cross-border business operations and creating new opportunities.",
-      category: "Technology",
-      date: "January 10, 2025",
-      readTime: "4 min read",
-      icon: TrendingUp
-    },
-    {
-      title: "Healthcare Supply Chain Management Best Practices",
-      excerpt: "Essential strategies for maintaining quality and efficiency in medical equipment distribution.",
-      category: "Healthcare",
-      date: "January 5, 2025",
-      readTime: "6 min read",
-      icon: Briefcase
-    },
-    {
-      title: "Sustainable Business Practices in Africa",
-      excerpt: "How companies are integrating environmental responsibility into their operations across the continent.",
-      category: "Sustainability",
-      date: "December 28, 2024",
-      readTime: "5 min read",
-      icon: Globe
-    },
-    {
-      title: "Marketing Strategies for Cross-Cultural Success",
-      excerpt: "Key insights for effectively reaching diverse markets in different cultural contexts.",
-      category: "Marketing",
-      date: "December 20, 2024",
-      readTime: "4 min read",
-      icon: TrendingUp
-    },
-    {
-      title: "The Role of AI in Modern Business Consultancy",
-      excerpt: "How artificial intelligence is enhancing decision-making and client services.",
-      category: "AI & Technology",
-      date: "December 15, 2024",
-      readTime: "7 min read",
-      icon: Briefcase
-    },
-    {
-      title: "Building Strong International Partnerships",
-      excerpt: "Lessons learned from successful cross-continental business collaborations.",
-      category: "Business Strategy",
-      date: "December 10, 2024",
-      readTime: "5 min read",
-      icon: Globe
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      toast({
+        title: "Error",
+        description: "Please enter your email",
+        variant: "destructive",
+      });
+      return;
     }
-  ];
+
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .insert([
+          {
+            name: 'Newsletter Subscriber',
+            email: email,
+            message: 'Newsletter subscription request',
+            type: 'newsletter',
+            status: 'unread'
+          }
+        ]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success!",
+        description: "You've been subscribed to our newsletter",
+      });
+      setEmail("");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to subscribe. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const categories = [
     "All Posts",
-    "Global Trade",
-    "Healthcare",
-    "Technology",
-    "Marketing",
-    "Business Strategy",
-    "Sustainability"
+    ...Array.from(new Set(blogPosts.map(post => post.category)))
   ];
+
+  const featuredPost = blogPosts.find(post => post.featured) || blogPosts[0];
+  const regularPosts = filteredPosts.filter(post => !post.featured || post.id !== featuredPost?.id);
 
   return (
     <div className="min-h-screen bg-background">
@@ -101,9 +124,10 @@ const Insights = () => {
             {categories.map((category, index) => (
               <Button
                 key={index}
-                variant={index === 0 ? "default" : "outline"}
+                variant={selectedCategory === category ? "default" : "outline"}
                 size="sm"
                 className="whitespace-nowrap"
+                onClick={() => setSelectedCategory(category)}
               >
                 {category}
               </Button>
@@ -113,51 +137,63 @@ const Insights = () => {
       </section>
 
       {/* Featured Post */}
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <Card className="overflow-hidden border-2 hover:border-accent/50 transition-colors">
-              <CardContent className="p-0">
-                <div className="grid lg:grid-cols-2 gap-0">
-                  <div className="bg-gradient-to-br from-accent/20 to-accent/5 p-16 flex items-center justify-center">
-                    <div className="text-center">
-                      <span className="text-9xl">{featuredPost.image}</span>
+      {featuredPost && (
+        <section className="py-12">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
+              <Card className="overflow-hidden border-2 hover:border-accent/50 transition-colors">
+                <CardContent className="p-0">
+                  <div className="grid lg:grid-cols-2 gap-0">
+                    {featuredPost.featured_image ? (
+                      <div className="bg-gradient-to-br from-accent/20 to-accent/5 p-16 flex items-center justify-center">
+                        <img 
+                          src={featuredPost.featured_image} 
+                          alt={featuredPost.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="bg-gradient-to-br from-accent/20 to-accent/5 p-16 flex items-center justify-center">
+                        <TrendingUp className="h-32 w-32 text-accent" />
+                      </div>
+                    )}
+                    <div className="p-12 flex flex-col justify-center">
+                      <Badge variant="secondary" className="w-fit mb-4">
+                        Featured Post
+                      </Badge>
+                      <Badge variant="outline" className="w-fit mb-6">
+                        {featuredPost.category}
+                      </Badge>
+                      <h2 className="text-3xl font-bold text-primary mb-4">
+                        {featuredPost.title}
+                      </h2>
+                      <p className="text-muted-foreground mb-6 leading-relaxed">
+                        {featuredPost.excerpt}
+                      </p>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          {featuredPost.published_at ? format(new Date(featuredPost.published_at), 'MMMM dd, yyyy') : 'N/A'}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4" />
+                          {featuredPost.views || 0} views
+                        </div>
+                      </div>
+                      <Link to={`/insights/${featuredPost.slug}`}>
+                        <Button variant="default" className="w-fit">
+                          Read Full Article
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </Link>
                     </div>
                   </div>
-                  <div className="p-12 flex flex-col justify-center">
-                    <Badge variant="secondary" className="w-fit mb-4">
-                      Featured Post
-                    </Badge>
-                    <Badge variant="outline" className="w-fit mb-6">
-                      {featuredPost.category}
-                    </Badge>
-                    <h2 className="text-3xl font-bold text-primary mb-4">
-                      {featuredPost.title}
-                    </h2>
-                    <p className="text-muted-foreground mb-6 leading-relaxed">
-                      {featuredPost.excerpt}
-                    </p>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        {featuredPost.date}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4" />
-                        {featuredPost.author}
-                      </div>
-                    </div>
-                    <Button variant="default" className="w-fit">
-                      Read Full Article
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Articles Grid */}
       <section className="py-20 bg-muted/30">
@@ -169,43 +205,49 @@ const Insights = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {articles.map((article, index) => (
-              <Card key={index} className="border-2 hover:border-accent/50 transition-all hover:-translate-y-1 flex flex-col">
-                <CardContent className="p-8 flex-1 flex flex-col">
-                  <div className="inline-flex p-3 rounded-xl bg-accent/10 w-fit mb-4">
-                    <article.icon className="h-6 w-6 text-accent" />
-                  </div>
-                  <Badge variant="outline" className="w-fit mb-4">
-                    {article.category}
-                  </Badge>
-                  <h3 className="text-xl font-bold text-primary mb-3">
-                    {article.title}
-                  </h3>
-                  <p className="text-muted-foreground mb-6 flex-1">
-                    {article.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground pt-4 border-t border-border">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      {article.date}
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Loading articles...</p>
+            </div>
+          ) : regularPosts.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No articles found in this category.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {regularPosts.slice(0, 6).map((article) => (
+                <Card key={article.id} className="border-2 hover:border-accent/50 transition-all hover:-translate-y-1 flex flex-col">
+                  <CardContent className="p-8 flex-1 flex flex-col">
+                    <div className="inline-flex p-3 rounded-xl bg-accent/10 w-fit mb-4">
+                      <TrendingUp className="h-6 w-6 text-accent" />
                     </div>
-                    <span>{article.readTime}</span>
-                  </div>
-                  <Button variant="ghost" className="w-full mt-4 justify-between group">
-                    Read More
-                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Button size="lg" variant="outline">
-              Load More Articles
-            </Button>
-          </div>
+                    <Badge variant="outline" className="w-fit mb-4">
+                      {article.category}
+                    </Badge>
+                    <h3 className="text-xl font-bold text-primary mb-3">
+                      {article.title}
+                    </h3>
+                    <p className="text-muted-foreground mb-6 flex-1">
+                      {article.excerpt}
+                    </p>
+                    <div className="flex items-center justify-between text-sm text-muted-foreground pt-4 border-t border-border">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        {article.published_at ? format(new Date(article.published_at), 'MMM dd, yyyy') : 'N/A'}
+                      </div>
+                      <span>{article.views || 0} views</span>
+                    </div>
+                    <Link to={`/insights/${article.slug}`}>
+                      <Button variant="ghost" className="w-full mt-4 justify-between group">
+                        Read More
+                        <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -219,16 +261,18 @@ const Insights = () => {
             <p className="text-xl mb-8 text-white/90">
               Subscribe to our newsletter for the latest insights, articles, and updates
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input
+            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+              <Input
                 type="email"
                 placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="flex-1 px-6 py-4 rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               />
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-primary font-semibold px-8">
+              <Button type="submit" size="lg" className="bg-accent hover:bg-accent/90 text-primary font-semibold px-8">
                 Subscribe
               </Button>
-            </div>
+            </form>
             <p className="text-sm text-white/70 mt-4">
               Join 500+ subscribers. No spam, unsubscribe anytime.
             </p>
