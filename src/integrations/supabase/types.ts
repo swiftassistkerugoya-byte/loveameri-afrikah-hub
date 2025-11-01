@@ -490,6 +490,48 @@ export type Database = {
         }
         Relationships: []
       }
+      team_members: {
+        Row: {
+          bio: string | null
+          created_at: string
+          display_order: number | null
+          email: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          name: string
+          phone: string | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          display_order?: number | null
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name: string
+          phone?: string | null
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          display_order?: number | null
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name?: string
+          phone?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

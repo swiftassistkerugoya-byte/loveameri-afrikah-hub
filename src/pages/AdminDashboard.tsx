@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   Users, Shield, LayoutDashboard, LogOut, Package, Briefcase, 
   FileText, MapPin, Bot, ShoppingCart, MessageSquare, 
-  BarChart3, Settings, FileCode, Activity 
+  BarChart3, Settings, FileCode, Activity, UserCog 
 } from "lucide-react";
 import AdminUsers from "@/components/admin/AdminUsers";
 import AdminRoles from "@/components/admin/AdminRoles";
@@ -24,6 +24,7 @@ import AdminAnalytics from "@/components/admin/AdminAnalytics";
 import AdminCMS from "@/components/admin/AdminCMS";
 import AdminSettings from "@/components/admin/AdminSettings";
 import AdminActivityLogs from "@/components/admin/AdminActivityLogs";
+import AdminTeam from "@/components/admin/AdminTeam";
 
 const AdminDashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -231,6 +232,9 @@ const AdminDashboard = () => {
             <Button size="sm" variant={activeTab === "logs" ? "default" : "outline"} onClick={() => setActiveTab("logs")}>
               <Activity className="h-4 w-4 mr-2" />Logs
             </Button>
+            <Button size="sm" variant={activeTab === "team" ? "default" : "outline"} onClick={() => setActiveTab("team")}>
+              <UserCog className="h-4 w-4 mr-2" />Team
+            </Button>
           </div>
 
           {/* Content */}
@@ -247,6 +251,7 @@ const AdminDashboard = () => {
           {activeTab === "cms" && <AdminCMS />}
           {activeTab === "settings" && <AdminSettings />}
           {activeTab === "logs" && <AdminActivityLogs />}
+          {activeTab === "team" && <AdminTeam />}
         </div>
       </div>
     </div>

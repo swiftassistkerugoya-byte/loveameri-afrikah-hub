@@ -43,6 +43,8 @@ const AdminProducts = () => {
     image_url: "",
     category: "",
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -69,16 +71,52 @@ const AdminProducts = () => {
     }
   };
 
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(filePath);
+
+      return data.publicUrl;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      toast({
+        title: "Error",
+        description: "Failed to upload image",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    setUploading(true);
     try {
+      let imageUrl = formData.image_url;
+
+      if (imageFile) {
+        const uploadedUrl = await uploadImage(imageFile);
+        if (uploadedUrl) imageUrl = uploadedUrl;
+      }
+
       const productData = {
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
         stock: parseInt(formData.stock),
-        image_url: formData.image_url || null,
+        image_url: imageUrl || null,
         category: formData.category,
       };
 
@@ -108,6 +146,8 @@ const AdminProducts = () => {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -147,6 +187,7 @@ const AdminProducts = () => {
 
   const resetForm = () => {
     setEditingProduct(null);
+    setImageFile(null);
     setFormData({
       name: "",
       description: "",
@@ -242,22 +283,37 @@ const AdminProducts = () => {
               </div>
 
               <div>
-                <Label htmlFor="image_url">Image URL</Label>
+                <Label htmlFor="image">Product Image</Label>
                 <Input
-                  id="image_url"
-                  type="url"
-                  placeholder="https://example.com/image.jpg"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setImageFile(e.target.files[0]);
+                    }
+                  }}
                 />
+                {(imageFile || formData.image_url) && (
+                  <div className="mt-2">
+                    <img 
+                      src={imageFile ? URL.createObjectURL(imageFile) : formData.image_url} 
+                      alt="Preview" 
+                      className="w-32 h-32 object-cover rounded"
+                    />
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">
+                  Upload a new image or keep the existing one
+                </p>
               </div>
 
               <div className="flex gap-2 justify-end">
                 <Button type="button" variant="outline" onClick={() => handleDialogClose(false)}>
                   Cancel
                 </Button>
-                <Button type="submit">
-                  {editingProduct ? "Update" : "Create"} Product
+                <Button type="submit" disabled={uploading}>
+                  {uploading ? "Uploading..." : editingProduct ? "Update" : "Create"} Product
                 </Button>
               </div>
             </form>
