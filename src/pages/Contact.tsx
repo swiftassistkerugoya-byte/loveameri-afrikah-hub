@@ -9,9 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useCompanySettings } from "@/hooks/useCompanySettings";
 
 const Contact = () => {
   const { toast } = useToast();
+  const { data: settings } = useCompanySettings();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -70,14 +72,14 @@ const Contact = () => {
     {
       icon: Mail,
       title: "Email Us",
-      details: ["info@loveameriafrikah.com", "sales@loveameriafrikah.com"],
-      action: "mailto:info@loveameriafrikah.com"
+      details: [settings?.company_email || "info@company.com"],
+      action: `mailto:${settings?.company_email}`
     },
     {
       icon: Phone,
       title: "Call Us",
-      details: ["Ghana: +233 59 601 4324", "Tanzania: +255 698 068 063"],
-      action: "tel:+233596014324"
+      details: [settings?.company_phone || "+1 234 567 8900"],
+      action: `tel:${settings?.company_phone}`
     },
     {
       icon: MapPin,
