@@ -1,91 +1,66 @@
+import { useEffect, useState } from "react";
 import { Building2, TrendingUp, Package, Droplet, Heart, Globe2, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Services = () => {
-  const services = [
-    {
-      icon: Building2,
-      title: "Business & Management Consultancy",
-      description: "Transform your business with our expert consultancy services. We provide strategic planning, corporate branding, organizational development, and market analysis to help your business thrive in today's competitive landscape.",
-      features: [
-        "Corporate Planning & Strategy",
-        "Brand Development & Positioning",
-        "Organizational Management",
-        "Market Research & Analysis",
-        "Business Process Optimization"
-      ],
-      color: "from-blue-600/10 to-blue-600/5"
-    },
-    {
-      icon: TrendingUp,
-      title: "Marketing & Management",
-      description: "Elevate your brand with comprehensive marketing strategies and professional management solutions. Our team helps you reach your target audience and achieve sustainable growth.",
-      features: [
-        "Digital Marketing Strategy",
-        "Brand Management",
-        "Content Marketing",
-        "Social Media Management",
-        "Performance Analytics"
-      ],
-      color: "from-green-600/10 to-green-600/5"
-    },
-    {
-      icon: Globe2,
-      title: "General Merchandising",
-      description: "Access global markets through our extensive trade network. We facilitate import/export operations and wholesale distribution across continents.",
-      features: [
-        "Import/Export Services",
-        "Wholesale Distribution",
-        "Supply Chain Management",
-        "Trade Facilitation",
-        "Logistics Coordination"
-      ],
-      color: "from-indigo-600/10 to-indigo-600/5"
-    },
-    {
-      icon: Package,
-      title: "Equipment Supply",
-      description: "Get access to quality equipment and essential supplies for various industries. We source and deliver the tools you need to operate efficiently.",
-      features: [
-        "Industrial Equipment",
-        "Safety Equipment",
-        "Office Supplies",
-        "Utility Tools",
-        "Custom Procurement"
-      ],
-      color: "from-purple-600/10 to-purple-600/5"
-    },
-    {
-      icon: Heart,
-      title: "Healthcare Supplies",
-      description: "Reliable medical equipment and healthcare essentials to support quality patient care. We provide hospital-grade supplies and hygiene products.",
-      features: [
-        "Medical Equipment",
-        "Hospital Consumables",
-        "Hygiene Products",
-        "Safety Gear",
-        "Healthcare Essentials"
-      ],
-      color: "from-red-600/10 to-red-600/5"
-    },
-    {
-      icon: Droplet,
-      title: "Bottled Water Distribution",
-      description: "Clean, pure, and sustainable bottled water solutions for businesses and individuals. Our products meet the highest quality standards.",
-      features: [
-        "Premium Bottled Water",
-        "Bulk Distribution",
-        "Custom Branding Options",
-        "Sustainable Packaging",
-        "Regular Delivery Service"
-      ],
-      color: "from-cyan-600/10 to-cyan-600/5"
+  const { toast } = useToast();
+  const [services, setServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const iconMap: Record<string, any> = {
+    "Building2": Building2,
+    "TrendingUp": TrendingUp,
+    "Globe2": Globe2,
+    "Package": Package,
+    "Heart": Heart,
+    "Droplet": Droplet
+  };
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  const fetchServices = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("services")
+        .select("*")
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+      setServices(data || []);
+    } catch (error) {
+      console.error("Error fetching services:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load services",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading services...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -106,44 +81,59 @@ const Services = () => {
       {/* Services Grid */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <div className="space-y-16">
-            {services.map((service, index) => (
-              <Card key={index} className="overflow-hidden border-2 hover:border-accent/50 transition-all">
-                <CardContent className="p-0">
-                  <div className="grid md:grid-cols-2 gap-0">
-                    <div className={`p-12 bg-gradient-to-br ${service.color}`}>
-                      <div className="inline-flex p-4 rounded-xl bg-white shadow-sm mb-6">
-                        <service.icon className="h-12 w-12 text-primary" />
+          {services.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No services available at the moment.</p>
+            </div>
+          ) : (
+            <div className="space-y-16">
+              {services.map((service, index) => {
+                const IconComponent = iconMap[service.hero_image || "Package"] || Package;
+                const colors = [
+                  "from-blue-600/10 to-blue-600/5",
+                  "from-green-600/10 to-green-600/5",
+                  "from-indigo-600/10 to-indigo-600/5",
+                  "from-purple-600/10 to-purple-600/5",
+                  "from-red-600/10 to-red-600/5",
+                  "from-cyan-600/10 to-cyan-600/5"
+                ];
+                const color = colors[index % colors.length];
+
+                return (
+                  <Card key={service.id} className="overflow-hidden border-2 hover:border-accent/50 transition-all">
+                    <CardContent className="p-0">
+                      <div className="grid md:grid-cols-2 gap-0">
+                        <div className={`p-12 bg-gradient-to-br ${color}`}>
+                          <div className="inline-flex p-4 rounded-xl bg-white shadow-sm mb-6">
+                            <IconComponent className="h-12 w-12 text-primary" />
+                          </div>
+                          <h3 className="text-3xl font-bold text-primary mb-4">{service.title}</h3>
+                          <p className="text-muted-foreground leading-relaxed mb-6">
+                            {service.description}
+                          </p>
+                          {service.price_range && (
+                            <p className="text-accent font-semibold mb-6">{service.price_range}</p>
+                          )}
+                          <Link to={service.cta_link || "/contact"}>
+                            <Button variant="default" className="bg-primary hover:bg-primary/90">
+                              Get a Quote
+                              <ArrowRight className="ml-2 h-4 w-4" />
+                            </Button>
+                          </Link>
+                        </div>
+                        <div className="p-12 bg-muted/30">
+                          <h4 className="text-xl font-semibold text-primary mb-6">Service Details</h4>
+                          <div className="prose prose-sm text-muted-foreground">
+                            {service.description}
+                          </div>
+                        </div>
                       </div>
-                      <h3 className="text-3xl font-bold text-primary mb-4">{service.title}</h3>
-                      <p className="text-muted-foreground leading-relaxed mb-6">
-                        {service.description}
-                      </p>
-                      <Link to="/contact">
-                        <Button variant="default" className="bg-primary hover:bg-primary/90">
-                          Get a Quote
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                      </Link>
-                    </div>
-                    <div className="p-12 bg-muted/30">
-                      <h4 className="text-xl font-semibold text-primary mb-6">What We Offer</h4>
-                      <ul className="space-y-3">
-                        {service.features.map((feature, idx) => (
-                          <li key={idx} className="flex items-start gap-3">
-                            <div className="h-6 w-6 rounded-full bg-accent/10 flex items-center justify-center shrink-0 mt-0.5">
-                              <div className="h-2 w-2 rounded-full bg-accent" />
-                            </div>
-                            <span className="text-muted-foreground">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 

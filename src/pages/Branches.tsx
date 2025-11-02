@@ -1,11 +1,51 @@
+import { useEffect, useState } from "react";
 import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Branches = () => {
-  const branches = [
+  const { toast } = useToast();
+  const [branches, setBranches] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchBranches();
+  }, []);
+
+  const fetchBranches = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("branches")
+        .select("*")
+        .eq("is_active", true)
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+      setBranches(data || []);
+    } catch (error) {
+      console.error("Error fetching branches:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load branches",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const countryFlags: Record<string, string> = {
+    "United States": "🇺🇸",
+    "Kenya": "🇰🇪",
+    "Tanzania": "🇹🇿",
+    "Ghana": "🇬🇭"
+  };
+
+  const oldBranches = [
     {
       country: "🇺🇸 United States",
       city: "Hagerstown, Maryland",
@@ -114,65 +154,91 @@ const Branches = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {branches.map((branch, index) => (
-              <Card key={index} className="border-2 hover:border-accent/50 transition-all hover:-translate-y-1">
-                <CardContent className="p-0">
-                  <div className={`p-8 bg-gradient-to-br ${branch.color}`}>
-                    <h3 className="text-3xl font-bold text-primary mb-2">{branch.country}</h3>
-                    <p className="text-lg text-muted-foreground mb-6">{branch.city}</p>
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading branches...</p>
+            </div>
+          ) : branches.length === 0 ? (
+            <div className="text-center py-12">
+              <MapPin className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">No branch locations available.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+              {branches.map((branch, index) => {
+                const colors = [
+                  "from-blue-600/10 to-blue-600/5",
+                  "from-green-600/10 to-green-600/5",
+                  "from-yellow-600/10 to-yellow-600/5",
+                  "from-red-600/10 to-red-600/5"
+                ];
+                const color = colors[index % colors.length];
+                const flag = countryFlags[branch.country] || "🌍";
 
-                    <div className="space-y-4">
-                      <div className="flex items-start gap-3">
-                        <MapPin className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-sm font-medium text-primary mb-1">Address</p>
-                          <p className="text-sm text-muted-foreground">{branch.address}</p>
+                return (
+                  <Card key={branch.id} className="border-2 hover:border-accent/50 transition-all hover:-translate-y-1">
+                    <CardContent className="p-0">
+                      <div className={`p-8 bg-gradient-to-br ${color}`}>
+                        {branch.image_url && (
+                          <div className="aspect-video w-full mb-6 rounded-lg overflow-hidden">
+                            <img src={branch.image_url} alt={branch.country} className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                        <h3 className="text-3xl font-bold text-primary mb-6">
+                          {flag} {branch.country}
+                        </h3>
+
+                        <div className="space-y-4">
+                          <div className="flex items-start gap-3">
+                            <MapPin className="h-5 w-5 text-accent shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-sm font-medium text-primary mb-1">Address</p>
+                              <p className="text-sm text-muted-foreground">{branch.address}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-3">
+                            <Phone className="h-5 w-5 text-accent shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-sm font-medium text-primary mb-1">Contact</p>
+                              <p className="text-sm text-muted-foreground">{branch.contact_info}</p>
+                              {branch.whatsapp && (
+                                <a href={`https://wa.me/${branch.whatsapp.replace(/\D/g, '')}`} className="text-sm text-accent hover:underline">
+                                  WhatsApp: {branch.whatsapp}
+                                </a>
+                              )}
+                            </div>
+                          </div>
+
+                          {branch.working_hours && (
+                            <div className="flex items-start gap-3">
+                              <Clock className="h-5 w-5 text-accent shrink-0 mt-0.5" />
+                              <div>
+                                <p className="text-sm font-medium text-primary mb-1">Office Hours</p>
+                                <p className="text-sm text-muted-foreground">{branch.working_hours}</p>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      </div>
 
-                      <div className="flex items-start gap-3">
-                        <Phone className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-sm font-medium text-primary mb-1">Phone</p>
-                          <a href={`tel:${branch.phone}`} className="text-sm text-muted-foreground hover:text-accent">
-                            {branch.phone}
-                          </a>
-                        </div>
+                        {branch.google_maps_link && (
+                          <div className="pt-6 mt-6 border-t border-border">
+                            <a href={branch.google_maps_link} target="_blank" rel="noopener noreferrer">
+                              <Button variant="outline" className="w-full">
+                                View on Google Maps
+                                <ExternalLink className="ml-2 h-4 w-4" />
+                              </Button>
+                            </a>
+                          </div>
+                        )}
                       </div>
-
-                      <div className="flex items-start gap-3">
-                        <Mail className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-sm font-medium text-primary mb-1">Email</p>
-                          <a href={`mailto:${branch.email}`} className="text-sm text-muted-foreground hover:text-accent">
-                            {branch.email}
-                          </a>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3">
-                        <Clock className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-sm font-medium text-primary mb-1">Office Hours</p>
-                          <p className="text-sm text-muted-foreground">{branch.hours}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="pt-6 mt-6 border-t border-border">
-                      <a href={branch.mapUrl} target="_blank" rel="noopener noreferrer">
-                        <Button variant="outline" className="w-full">
-                          View on Google Maps
-                          <ExternalLink className="ml-2 h-4 w-4" />
-                        </Button>
-                      </a>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 

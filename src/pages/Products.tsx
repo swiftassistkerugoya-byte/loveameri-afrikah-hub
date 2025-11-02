@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Droplet, Package, Heart, ShoppingCart, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
@@ -5,8 +6,47 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Products = () => {
+  const { toast } = useToast();
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+      setProducts(data || []);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load products",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const groupedProducts = products.reduce((acc: any, product) => {
+    if (!acc[product.category]) {
+      acc[product.category] = [];
+    }
+    acc[product.category].push(product);
+    return acc;
+  }, {});
+
   const bottledWaterProducts = [
     {
       name: "Premium Purified Water",
@@ -84,48 +124,67 @@ const Products = () => {
         </div>
       </section>
 
-      {/* Bottled Water Section */}
+      {/* Products Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <Droplet className="h-16 w-16 text-accent mx-auto mb-4" />
-            <h2 className="text-4xl font-bold text-primary mb-4">Premium Bottled Water</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Clean, pure, and sustainable water solutions for every need
-            </p>
-          </div>
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading products...</p>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="text-center py-12">
+              <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">No products available at the moment.</p>
+            </div>
+          ) : (
+            Object.entries(groupedProducts).map(([category, categoryProducts]: [string, any]) => (
+              <div key={category} className="mb-20">
+                <div className="text-center mb-16">
+                  <Package className="h-16 w-16 text-accent mx-auto mb-4" />
+                  <h2 className="text-4xl font-bold text-primary mb-4">{category}</h2>
+                </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {bottledWaterProducts.map((product, index) => (
-              <Card key={index} className="border-2 hover:border-accent/50 transition-all hover:-translate-y-1">
-                <CardContent className="p-8">
-                  <div className="inline-flex items-center gap-2 mb-4">
-                    <Badge variant="secondary" className="text-sm">{product.size}</Badge>
-                  </div>
-                  <h3 className="text-2xl font-bold text-primary mb-3">{product.name}</h3>
-                  <p className="text-muted-foreground mb-6">{product.description}</p>
-                  
-                  <div className="space-y-2 mb-6">
-                    {product.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-center gap-2">
-                        <div className="h-1.5 w-1.5 rounded-full bg-accent" />
-                        <span className="text-sm text-muted-foreground">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="pt-4 border-t border-border">
-                    <p className="text-sm font-semibold text-accent mb-4">{product.price}</p>
-                    <Link to="/contact">
-                      <Button variant="outline" className="w-full">
-                        Request Quote
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                  {categoryProducts.map((product: any) => (
+                    <Card key={product.id} className="border-2 hover:border-accent/50 transition-all hover:-translate-y-1">
+                      <CardContent className="p-0">
+                        {product.image_url && (
+                          <div className="aspect-video w-full overflow-hidden bg-muted">
+                            <img 
+                              src={product.image_url} 
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <div className="p-6">
+                          <div className="flex items-center justify-between mb-3">
+                            <h3 className="text-xl font-bold text-primary">{product.name}</h3>
+                            <Badge variant={product.stock > 0 ? "default" : "secondary"}>
+                              {product.stock > 0 ? "In Stock" : "Out of Stock"}
+                            </Badge>
+                          </div>
+                          {product.description && (
+                            <p className="text-sm text-muted-foreground mb-4 line-clamp-3">{product.description}</p>
+                          )}
+                          
+                          <div className="pt-4 border-t border-border">
+                            <p className="text-2xl font-bold text-accent mb-4">${product.price}</p>
+                            <Link to="/contact">
+                              <Button variant="outline" className="w-full">
+                                Request Quote
+                              </Button>
+                            </Link>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </section>
 

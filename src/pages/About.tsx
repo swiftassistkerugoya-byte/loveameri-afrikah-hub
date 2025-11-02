@@ -1,9 +1,43 @@
-import { Target, Eye, Award, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Target, Eye, Award, Users, Mail, Phone } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const About = () => {
+  const { toast } = useToast();
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTeamMembers();
+  }, []);
+
+  const fetchTeamMembers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("team_members")
+        .select("*")
+        .eq("is_active", true)
+        .order("display_order", { ascending: true });
+
+      if (error) throw error;
+      setTeamMembers(data || []);
+    } catch (error) {
+      console.error("Error fetching team members:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load team members",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -112,17 +146,59 @@ const About = () => {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-primary mb-12 text-center">Our Leadership Team</h2>
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex p-6 rounded-2xl bg-accent/10 mb-6">
-              <Users className="h-16 w-16 text-accent" />
+          
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading team members...</p>
             </div>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              Our leadership team comprises experienced professionals with deep expertise in 
-              international trade, business management, and healthcare solutions. Together, 
-              they guide our strategic direction and ensure we deliver exceptional value to 
-              our clients across all markets we serve.
-            </p>
-          </div>
+          ) : teamMembers.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {teamMembers.map((member) => (
+                <Card key={member.id} className="border-2 hover:border-accent/50 transition-all hover:-translate-y-1">
+                  <CardContent className="p-6 text-center">
+                    <Avatar className="h-32 w-32 mx-auto mb-4">
+                      <AvatarImage src={member.image_url} alt={member.name} />
+                      <AvatarFallback className="bg-accent/10 text-accent text-2xl">
+                        {member.name.split(' ').map((n: string) => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <h3 className="text-xl font-bold text-primary mb-1">{member.name}</h3>
+                    <p className="text-accent font-medium mb-3">{member.role}</p>
+                    {member.bio && (
+                      <p className="text-sm text-muted-foreground mb-4 line-clamp-3">{member.bio}</p>
+                    )}
+                    <div className="space-y-2 text-sm">
+                      {member.email && (
+                        <a href={`mailto:${member.email}`} className="flex items-center justify-center gap-2 text-muted-foreground hover:text-accent transition-colors">
+                          <Mail className="h-4 w-4" />
+                          <span className="truncate">{member.email}</span>
+                        </a>
+                      )}
+                      {member.phone && (
+                        <a href={`tel:${member.phone}`} className="flex items-center justify-center gap-2 text-muted-foreground hover:text-accent transition-colors">
+                          <Phone className="h-4 w-4" />
+                          <span>{member.phone}</span>
+                        </a>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="max-w-4xl mx-auto text-center">
+              <div className="inline-flex p-6 rounded-2xl bg-accent/10 mb-6">
+                <Users className="h-16 w-16 text-accent" />
+              </div>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                Our leadership team comprises experienced professionals with deep expertise in 
+                international trade, business management, and healthcare solutions. Together, 
+                they guide our strategic direction and ensure we deliver exceptional value to 
+                our clients across all markets we serve.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
