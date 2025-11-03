@@ -25,6 +25,7 @@ import AdminCMS from "@/components/admin/AdminCMS";
 import AdminSettings from "@/components/admin/AdminSettings";
 import AdminActivityLogs from "@/components/admin/AdminActivityLogs";
 import AdminTeam from "@/components/admin/AdminTeam";
+import AdminHomepage from "@/components/admin/AdminHomepage";
 
 const AdminDashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -32,6 +33,7 @@ const AdminDashboard = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
+  const [stats, setStats] = useState({ totalUsers: 0, adminUsers: 0 });
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -92,11 +94,34 @@ const AdminDashboard = () => {
           variant: "destructive",
         });
         navigate("/");
+      } else {
+        // Fetch stats
+        fetchStats();
       }
     };
 
     checkAdminStatus();
   }, [user, navigate, toast]);
+
+  const fetchStats = async () => {
+    try {
+      const { count: totalUsers } = await supabase
+        .from("profiles")
+        .select("*", { count: "exact", head: true });
+
+      const { count: adminUsers } = await supabase
+        .from("user_roles")
+        .select("*", { count: "exact", head: true })
+        .eq("role", "admin");
+
+      setStats({
+        totalUsers: totalUsers || 0,
+        adminUsers: adminUsers || 0,
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -130,10 +155,15 @@ const AdminDashboard = () => {
             <LayoutDashboard className="h-6 w-6" />
             <h1 className="text-2xl font-bold">Admin Dashboard</h1>
           </div>
-          <Button variant="outline" onClick={handleSignOut}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate("/")}>
+              Home
+            </Button>
+            <Button variant="outline" onClick={handleSignOut}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -150,7 +180,7 @@ const AdminDashboard = () => {
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">-</div>
+                  <div className="text-2xl font-bold">{stats.totalUsers}</div>
                   <p className="text-xs text-muted-foreground">
                     Registered users
                   </p>
@@ -165,7 +195,7 @@ const AdminDashboard = () => {
                   <Shield className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">-</div>
+                  <div className="text-2xl font-bold">{stats.adminUsers}</div>
                   <p className="text-xs text-muted-foreground">
                     Users with admin role
                   </p>
@@ -192,6 +222,9 @@ const AdminDashboard = () => {
           <div className="flex gap-2 border-b pb-4 overflow-x-auto">
             <Button size="sm" variant={activeTab === "overview" ? "default" : "outline"} onClick={() => setActiveTab("overview")}>
               <LayoutDashboard className="h-4 w-4 mr-2" />Overview
+            </Button>
+            <Button size="sm" variant={activeTab === "homepage" ? "default" : "outline"} onClick={() => setActiveTab("homepage")}>
+              <FileCode className="h-4 w-4 mr-2" />Homepage
             </Button>
             <Button size="sm" variant={activeTab === "products" ? "default" : "outline"} onClick={() => setActiveTab("products")}>
               <Package className="h-4 w-4 mr-2" />Products
@@ -238,6 +271,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Content */}
+          {activeTab === "homepage" && <AdminHomepage />}
           {activeTab === "products" && <AdminProducts />}
           {activeTab === "services" && <AdminServices />}
           {activeTab === "blog" && <AdminBlog />}

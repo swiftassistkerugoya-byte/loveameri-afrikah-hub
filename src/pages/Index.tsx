@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import { useHomepageContent } from "@/hooks/useHomepageContent";
 
 const Index = () => {
+  const { data: content } = useHomepageContent();
   const services = [
     {
       icon: Building2,
@@ -46,10 +48,10 @@ const Index = () => {
   ];
 
   const stats = [
-    { value: "4", label: "Countries" },
-    { value: "5+", label: "Offices" },
-    { value: "100+", label: "Clients" },
-    { value: "24/7", label: "Support" }
+    { value: content?.stats_countries || "4", label: "Countries" },
+    { value: content?.stats_offices || "5+", label: "Offices" },
+    { value: content?.stats_clients || "100+", label: "Clients" },
+    { value: content?.stats_support || "24/7", label: "Support" }
   ];
 
   const whyChooseUs = [
@@ -75,15 +77,15 @@ const Index = () => {
             </div>
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-              LoveAmeriAfrikah<br />
+              {content?.hero_title || "LoveAmeriAfrikah"}<br />
               <span className="bg-gradient-gold bg-clip-text text-transparent">Enterprises Ltd</span>
             </h1>
             
             <p className="text-xl md:text-2xl mb-4 text-white/90 font-light">
-              General Merchants & Business Consultants
+              {content?.hero_subtitle || "General Merchants & Business Consultants"}
             </p>
             <p className="text-lg mb-8 text-white/80">
-              Equipment Supply | Healthcare Solutions | International Trade
+              {content?.hero_description || "Equipment Supply | Healthcare Solutions | International Trade"}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -125,10 +127,10 @@ const Index = () => {
       <section className="py-16 bg-gradient-primary text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Connecting Africa to the World
+            {content?.mission_title || "Connecting Africa to the World"}
           </h2>
           <p className="text-xl text-white/90 max-w-3xl mx-auto">
-            Through smart trade, expert management, and innovative solutions
+            {content?.mission_description || "Through smart trade, expert management, and innovative solutions"}
           </p>
         </div>
       </section>
