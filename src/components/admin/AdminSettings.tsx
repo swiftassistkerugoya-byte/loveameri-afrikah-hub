@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface CompanySettings {
   company_name: string;
@@ -17,6 +18,7 @@ interface CompanySettings {
 }
 
 const AdminSettings = () => {
+  const queryClient = useQueryClient();
   const [settings, setSettings] = useState<CompanySettings>({
     company_name: "",
     company_email: "",
@@ -84,6 +86,9 @@ const AdminSettings = () => {
         setSettingsId(data.id);
       }
 
+      // Invalidate company settings cache so changes appear immediately
+      queryClient.invalidateQueries({ queryKey: ["company-settings"] });
+      
       toast.success("Settings saved successfully");
     } catch (error: any) {
       toast.error("Failed to save settings");
