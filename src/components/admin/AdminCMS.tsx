@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface CmsPage {
   id: string;
@@ -28,6 +29,7 @@ const AdminCMS = () => {
     title: "",
     content: "",
   });
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     fetchPages();
@@ -80,6 +82,7 @@ const AdminCMS = () => {
       setDialogOpen(false);
       setEditingPage(null);
       setFormData({ page_key: "", title: "", content: "" });
+      queryClient.invalidateQueries({ queryKey: ["cms-pages"] });
       fetchPages();
     } catch (error: any) {
       toast.error("Failed to save page");
@@ -105,6 +108,7 @@ const AdminCMS = () => {
 
       if (error) throw error;
       toast.success("Page deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["cms-pages"] });
       fetchPages();
     } catch (error: any) {
       toast.error("Failed to delete page");

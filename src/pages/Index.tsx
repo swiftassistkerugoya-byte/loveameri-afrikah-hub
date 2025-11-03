@@ -5,9 +5,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
+import { useCmsPages } from "@/hooks/useCmsPages";
 
 const Index = () => {
   const { data: content } = useHomepageContent();
+  const { data: cmsPages } = useCmsPages();
   const services = [
     {
       icon: Building2,
@@ -77,8 +79,7 @@ const Index = () => {
             </div>
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-              {content?.hero_title || "LoveAmeriAfrikah"}<br />
-              <span className="bg-gradient-gold bg-clip-text text-transparent">Enterprises Ltd</span>
+              {content?.hero_title || "LoveAmeriAfrikah"}
             </h1>
             
             <p className="text-xl md:text-2xl mb-4 text-white/90 font-light">
@@ -191,6 +192,29 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* CMS Pages Section */}
+      {cmsPages && cmsPages.length > 0 && (
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">Additional Information</h2>
+              <p className="text-xl text-muted-foreground">Important content and updates</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {cmsPages.map((page) => (
+                <Card key={page.id} className="hover:shadow-card transition-all duration-300 hover:-translate-y-1">
+                  <CardContent className="p-6">
+                    <h3 className="text-2xl font-semibold text-primary mb-4">{page.title}</h3>
+                    <p className="text-muted-foreground whitespace-pre-wrap">{page.content?.text || ""}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-primary text-white">

@@ -21,7 +21,7 @@ interface HomepageContent {
 }
 
 const defaultContent: HomepageContent = {
-  hero_title: "LoveAmeriAfrikah Enterprises Ltd",
+  hero_title: "LoveAmeriAfrikah",
   hero_subtitle: "General Merchants & Business Consultants",
   hero_description: "Equipment Supply | Healthcare Solutions | International Trade",
   stats_countries: "4",
