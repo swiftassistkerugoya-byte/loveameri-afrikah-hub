@@ -202,12 +202,17 @@ const Index = () => {
               <p className="text-xl text-muted-foreground">Important content and updates</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {cmsPages.map((page) => (
                 <Card key={page.id} className="hover:shadow-card transition-all duration-300 hover:-translate-y-1">
-                  <CardContent className="p-6">
-                    <h3 className="text-2xl font-semibold text-primary mb-4">{page.title}</h3>
-                    <p className="text-muted-foreground whitespace-pre-wrap">{page.content?.text || ""}</p>
+                  <CardContent className="p-6 flex gap-6">
+                    <div className="flex-shrink-0 w-16 h-16 rounded-xl bg-accent/10 flex items-center justify-center">
+                      <Globe2 className="h-8 w-8 text-accent" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold text-primary mb-2">{page.title}</h3>
+                      <p className="text-muted-foreground text-sm line-clamp-3">{page.content?.text || ""}</p>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
