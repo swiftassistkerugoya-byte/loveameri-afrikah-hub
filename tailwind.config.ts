@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Poppins', 'sans-serif'],
+        sans: ['"Times New Roman"', 'Times', 'serif'],
       },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
