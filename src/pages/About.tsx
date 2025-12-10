@@ -153,32 +153,34 @@ const About = () => {
               <p className="text-muted-foreground">Loading team members...</p>
             </div>
           ) : teamMembers.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="grid gap-6 max-w-5xl mx-auto">
               {teamMembers.map((member) => (
-                <Card key={member.id} className="border-2 hover:border-accent/50 transition-all hover:-translate-y-1">
-                  <CardContent className="p-6 text-center">
-                    <Avatar className="h-32 w-32 mx-auto mb-4">
+                <Card key={member.id} className="border-2 hover:border-accent/50 transition-all hover:shadow-card">
+                  <CardContent className="p-6 flex flex-col md:flex-row items-center gap-6">
+                    <Avatar className="h-24 w-24 shrink-0">
                       <AvatarImage src={member.image_url} alt={member.name} />
-                      <AvatarFallback className="bg-accent/10 text-accent text-2xl">
+                      <AvatarFallback className="bg-accent/10 text-accent text-xl">
                         {member.name.split(' ').map((n: string) => n[0]).join('')}
                       </AvatarFallback>
                     </Avatar>
-                    <h3 className="text-xl font-bold text-primary mb-1">{member.name}</h3>
-                    <p className="text-accent font-medium mb-3">{member.role}</p>
-                    {member.bio && (
-                      <p className="text-sm text-muted-foreground mb-4 line-clamp-3">{member.bio}</p>
-                    )}
-                    <div className="space-y-2 text-sm">
+                    <div className="flex-1 text-center md:text-left">
+                      <h3 className="text-xl font-bold text-primary mb-1">{member.name}</h3>
+                      <p className="text-accent font-medium mb-2">{member.role}</p>
+                      {member.bio && (
+                        <p className="text-sm text-muted-foreground line-clamp-2">{member.bio}</p>
+                      )}
+                    </div>
+                    <div className="flex md:flex-col gap-3 text-sm shrink-0">
                       {member.email && (
-                        <a href={`mailto:${member.email}`} className="flex items-center justify-center gap-2 text-muted-foreground hover:text-accent transition-colors">
+                        <a href={`mailto:${member.email}`} className="flex items-center gap-2 text-muted-foreground hover:text-accent transition-colors px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted">
                           <Mail className="h-4 w-4" />
-                          <span className="truncate">{member.email}</span>
+                          <span className="hidden sm:inline truncate max-w-[150px]">{member.email}</span>
                         </a>
                       )}
                       {member.phone && (
-                        <a href={`tel:${member.phone}`} className="flex items-center justify-center gap-2 text-muted-foreground hover:text-accent transition-colors">
+                        <a href={`tel:${member.phone}`} className="flex items-center gap-2 text-muted-foreground hover:text-accent transition-colors px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted">
                           <Phone className="h-4 w-4" />
-                          <span>{member.phone}</span>
+                          <span className="hidden sm:inline">{member.phone}</span>
                         </a>
                       )}
                     </div>
