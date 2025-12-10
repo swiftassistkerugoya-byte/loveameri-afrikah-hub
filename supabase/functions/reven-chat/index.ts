@@ -32,33 +32,42 @@ serve(async (req) => {
       .single();
 
     // Fetch company data for comprehensive knowledge
-    const [products, services, branches, blogPosts, team] = await Promise.all([
-      supabase.from('products').select('*').eq('is_active', true),
+    const [products, services, branches, blogPosts, team, cmsPages, companySettings] = await Promise.all([
+      supabase.from('products').select('*'),
       supabase.from('services').select('*'),
-      supabase.from('branches').select('*'),
-      supabase.from('blog_posts').select('*').eq('published', true),
-      supabase.from('team_members').select('*')
+      supabase.from('branches').select('*').eq('is_active', true),
+      supabase.from('blog_posts').select('*').eq('status', 'published'),
+      supabase.from('team_members').select('*').eq('is_active', true),
+      supabase.from('cms_pages').select('*'),
+      supabase.from('company_settings').select('*')
     ]);
 
     // Build comprehensive system prompt
     const companyInfo = `
 ## LoveAmeriAfrikah Enterprises Overview
-We are a leading technology and logistics company serving Africa and America.
+We are a leading general merchant and business consultancy company operating across Africa and the USA.
+We specialize in Equipment Supply, Healthcare Solutions, International Trade, Bottled Water Distribution, and Business Consultancy.
 
 ### Our Products:
-${products.data?.map(p => `- ${p.name}: ${p.description} (Price: $${p.price}, Stock: ${p.stock_quantity})`).join('\n') || 'No products available'}
+${products.data?.map(p => `- ${p.name}: ${p.description || 'Quality product'} (Price: KES ${p.price}, Stock: ${p.stock} units, Category: ${p.category})`).join('\n') || 'No products currently listed'}
 
 ### Our Services:
-${services.data?.map(s => `- ${s.name}: ${s.description} (Price: $${s.price})`).join('\n') || 'No services available'}
+${services.data?.map(s => `- ${s.title}: ${s.description}${s.price_range ? ` (${s.price_range})` : ''}`).join('\n') || 'No services currently listed'}
 
-### Our Branches:
-${branches.data?.map(b => `- ${b.name} (${b.city}, ${b.country}): ${b.address} | Phone: ${b.phone} | Email: ${b.email}`).join('\n') || 'No branches listed'}
+### Our Branch Locations:
+${branches.data?.map(b => `- ${b.country}: ${b.address} | Contact: ${b.contact_info}${b.whatsapp ? ` | WhatsApp: ${b.whatsapp}` : ''}${b.working_hours ? ` | Hours: ${b.working_hours}` : ''}`).join('\n') || 'No branches listed'}
 
 ### Our Team:
-${team.data?.map(t => `- ${t.name} (${t.role}): ${t.bio || 'Team member'}`).join('\n') || 'Team information coming soon'}
+${team.data?.map(t => `- ${t.name} (${t.role}): ${t.bio || 'Dedicated team member'}${t.email ? ` | Email: ${t.email}` : ''}${t.phone ? ` | Phone: ${t.phone}` : ''}`).join('\n') || 'Team information coming soon'}
 
-### Latest Insights:
-${blogPosts.data?.slice(0, 5).map(b => `- ${b.title}: ${b.excerpt}`).join('\n') || 'No blog posts available'}
+### Latest Blog Posts & Insights:
+${blogPosts.data?.slice(0, 5).map(b => `- ${b.title} (${b.category}): ${b.excerpt || b.content?.substring(0, 150) + '...'}`).join('\n') || 'No blog posts available'}
+
+### Additional Company Information:
+${cmsPages.data?.map(p => `- ${p.title}: ${(p.content as any)?.text || ''}`).join('\n') || ''}
+
+### Company Settings:
+${companySettings.data?.map(s => `- ${s.setting_key}: ${JSON.stringify(s.setting_value)}`).join('\n') || ''}
 `;
 
     const systemPrompt = `You are Reven, the AI virtual assistant for LoveAmeriAfrikah Enterprises.
