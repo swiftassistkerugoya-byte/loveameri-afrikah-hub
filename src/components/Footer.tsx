@@ -78,7 +78,16 @@ const Footer = () => {
 
         <div className="mt-12 pt-8 border-t border-primary-foreground/20 text-center text-sm opacity-80 space-y-2">
           <p>&copy; {new Date().getFullYear()} {settings?.company_name}. All rights reserved.</p>
-          <p>Developed by <span className="font-semibold text-accent">Laban Panda Khisa</span></p>
+          <p className="flex items-center justify-center gap-2 flex-wrap">
+            Developed with ❤️ by{" "}
+            <a 
+              href="mailto:info@labankhisa.co.ke" 
+              className="font-semibold text-accent hover:underline inline-flex items-center gap-1"
+            >
+              Laban Panda Khisa
+              <Mail className="h-3 w-3" />
+            </a>
+          </p>
         </div>
       </div>
     </footer>
