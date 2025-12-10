@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Bot, Send, X, History, Trash2 } from "lucide-react";
+import { Bot, Send, X, History, Trash2, ShoppingBag, Phone, MapPin, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -10,6 +10,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+const quickActions = [
+  { label: "View Products", icon: ShoppingBag, message: "What products do you have available?" },
+  { label: "Contact Us", icon: Phone, message: "How can I contact LoveAmeriAfrikah?" },
+  { label: "Find Branch", icon: MapPin, message: "Where are your branch locations?" },
+  { label: "Get Help", icon: HelpCircle, message: "What services do you offer?" },
+];
 
 interface Message {
   role: "user" | "assistant";
@@ -107,10 +114,11 @@ export const RevenChat = () => {
     }
   };
 
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (quickMessage?: string) => {
+    const messageText = quickMessage || input;
+    if (!messageText.trim() || isLoading) return;
 
-    const userMessage: Message = { role: "user", content: input };
+    const userMessage: Message = { role: "user", content: messageText };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
@@ -287,6 +295,28 @@ export const RevenChat = () => {
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Quick Actions */}
+        {messages.length <= 1 && (
+          <div className="px-4 py-2 border-t border-border bg-muted/30">
+            <p className="text-xs text-muted-foreground mb-2">Quick actions:</p>
+            <div className="flex flex-wrap gap-2">
+              {quickActions.map((action) => (
+                <Button
+                  key={action.label}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-8 gap-1.5"
+                  onClick={() => sendMessage(action.message)}
+                  disabled={isLoading}
+                >
+                  <action.icon className="h-3 w-3" />
+                  {action.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Chat Input */}
         <div className="p-4 border-t border-border bg-background rounded-b-lg">
           <div className="flex gap-2">
@@ -299,7 +329,7 @@ export const RevenChat = () => {
               className="flex-1 px-4 py-2 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-accent bg-background"
               disabled={isLoading}
             />
-            <Button onClick={sendMessage} disabled={isLoading || !input.trim()}>
+            <Button onClick={() => sendMessage()} disabled={isLoading || !input.trim()}>
               <Send className="h-4 w-4" />
             </Button>
           </div>
